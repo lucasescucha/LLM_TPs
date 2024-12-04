@@ -36,12 +36,10 @@ class SelectableRetriever(BaseRetriever, BaseModel):
     def __init__(self, pinecone_api: Pinecone) -> object:
         super().__init__()
 
-        indexes = [index_info["name"]
-                   for index_info in pinecone_api.list_indexes()]
-
-        for index in indexes:
-            vector_store = SelectableRetriever.__create_vector_store(index)
-            self._retrievers[index] = vector_store.as_retriever()
+        for index in pinecone_api.list_indexes():
+            index_name = index["name"]
+            vector_store = SelectableRetriever.__create_vector_store(index_name)
+            self._retrievers[index_name] = vector_store.as_retriever()
 
     def _get_relevant_documents(self, query: str, *, run_manager) -> list[Document]:
         index_name = SelectableRetriever.__get_index_from_prompt(query)
